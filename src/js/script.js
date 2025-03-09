@@ -1,10 +1,28 @@
-{
-  'use strict';
+'use strict';
 
-  const favoriteBooks = [];
-  const filters = [];
+class BooksList {
+  constructor() {
+    this.favoriteBooks = [];
+    this.filters = [];
+    this.initData();
+    this.getElements();
+    this.render();
+    this.initActions();
+  }
 
-  function determineRatingBgc(rating) {
+  initData() {
+    this.data = dataSource.books;
+  }
+
+  getElements() {
+    this.booksList = document.querySelector('.books-list');
+    this.filtersForm = document.querySelector('.filters');
+    this.templateBook = Handlebars.compile(
+      document.querySelector('#template-book').innerHTML
+    );
+  }
+
+  determineRatingBgc(rating) {
     if (rating < 6) {
       return 'linear-gradient(to bottom, #fefcea 0%, #f1da36 100%)';
     } else if (rating > 6 && rating <= 8) {
@@ -16,23 +34,16 @@
     }
   }
 
-  function render() {
-    //pobieranie referencji do szablonu
-    const templateBook = Handlebars.compile(
-      document.querySelector('#template-book').innerHTML
-    );
-
-    //pobranie referencji do listy ksiazek
-    const booksList = document.querySelector('.books-list');
-    booksList.innerHTML = '';
+  render() {
+    this.booksList.innerHTML = '';
 
     //iteracja po kazdym elemencie z dataSource.books
-    for (let book of dataSource.books) {
+    for (let book of this.data) {
 
       /*obliczenie ratingWidth i ratingBgc i
       przeksztalcenie ratingu na sklae procentowa */
       const ratingWidth = book.rating * 10;
-      const ratingBgc = determineRatingBgc(book.rating);
+      const ratingBgc = this.determineRatingBgc(book.rating);
 
       //dodanie nowych wlasciwosci do obiektu
       const bookData = {
@@ -42,20 +53,18 @@
       };
 
       //wygenerwoanie kodu html na podstawie szablony idanych o konkretnej ksiazce
-      const generatedHTML = templateBook(bookData);
+      const generatedHTML = this.templateBook(bookData);
       //generowanie elemntu DOM na podstawie HTML
       const element = document.createElement('div');
       element.innerHTML = generatedHTML;
+
       //dodanie wygenerowanego elementu do listy ksiazek
-      booksList.appendChild(element.firstElementChild);
+      this.booksList.appendChild(element.firstElementChild);
     }
   }
 
-  function initActions() {
-    const booksList = document.querySelector('.books-list');
-    const filtersForm = document.querySelector('.filters');
-
-    booksList.addEventListener('dblclick', function (event) {
+  initActions() {
+    this.booksList.addEventListener('dblclick', (event) => {
       //zatrzymanie dzialania
       event.preventDefault();
 
@@ -66,20 +75,20 @@
         //pobiera id ksiazki
         const bookId = clickedElement.getAttribute('data-id');
 
-        if (favoriteBooks.includes(bookId)) {
+        if (this.favoriteBooks.includes(bookId)) {
           //usuwanie z ulub
           clickedElement.classList.remove('favorite');
-          const index = favoriteBooks.indexOf(bookId);
-          favoriteBooks.splice(index, 1);
+          const index = this.favoriteBooks.indexOf(bookId);
+          this.favoriteBooks.splice(index, 1);
         } else {
           //dodanie do ulub
           clickedElement.classList.add('favorite');
-          favoriteBooks.push(bookId);
+          this.favoriteBooks.push(bookId);
         }
       }
     });
 
-    filtersForm.addEventListener('click', function (event) {
+    this.filtersForm.addEventListener('click', (event) => {
       if (
         event.target.tagName === 'INPUT' &&
         event.target.type === 'checkbox' &&
@@ -88,25 +97,23 @@
         const filterValue = event.target.value;
 
         if (event.target.checked) {
-          filters.push(filterValue);
+          this.filters.push(filterValue);
         } else {
-          const index = filters.indexOf(filterValue);
+          const index = this.filters.indexOf(filterValue);
           if (index !== -1) {
-            filters.splice(index, 1);
+            this.filters.splice(index, 1);
           }
         }
-
-        console.log('Aktualne filtry:', filters);
-        filterBooks();
+        this.filterBooks();
       }
     });
   }
 
-  function filterBooks() {
-    for (let book of dataSource.books) {
+  filterBooks() {
+    for (let book of this.data) {
       let shouldBeHidden = false;
 
-      for (let filter of filters) {
+      for (let filter of this.filters) {
         if (!book.details[filter]) {
           shouldBeHidden = true;
           break;
@@ -124,9 +131,6 @@
       }
     }
   }
-
-
-  //wywolanie
-  render();
-  initActions();
 }
+const app = new BooksList();
+
