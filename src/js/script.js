@@ -3,6 +3,7 @@
   'use strict';
 
   const favoriteBooks = [];
+  const filters = [];
 
   function render() {
     //pobieranie referencji do szablonu
@@ -27,11 +28,7 @@
 
   function initActions() {
     const booksList = document.querySelector('.books-list');
-
-    if (!booksList) {
-      console.log("element .books-list nie istnieje");
-      return;
-    }
+    const filtersForm = document.querySelector('.filters');
 
     booksList.addEventListener('dblclick', function (event) {
       //zatrzymanie dzialania
@@ -56,6 +53,41 @@
         }
       }
     });
+
+    filtersForm.addEventListener('click', function (event) {
+      if (
+        event.target.tagName === 'INPUT' &&
+        event.target.type === 'checkbox' &&
+        event.target.name === 'filter'
+      ) {
+        console.log(event.target.value);
+        filterBooks();
+      }
+    });
+  }
+
+  function filterBooks() {
+    for (let book of dataSource.books) {
+      let shouldBeHidden = false;
+      for (let filter of filters) {
+        //jesli filtr powinien byc true a nie jest
+        if (!book.details[filter]) {
+          shouldBeHidden = true;
+          break;
+        }
+
+        //szukanie ksiazki po id
+        const bookElement = document.querySelector(`.book__image[data-id="${book.id}"]`);
+
+        if (bookElement) {
+          if (shouldBeHidden) {
+            bookElement.classList.add('hidden');
+          } else {
+            bookElement.classList.remove('hidden');
+          }
+        }
+      }
+    }
   }
 
 
