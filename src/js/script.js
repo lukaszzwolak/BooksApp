@@ -1,4 +1,3 @@
-
 {
   'use strict';
 
@@ -60,7 +59,18 @@
         event.target.type === 'checkbox' &&
         event.target.name === 'filter'
       ) {
-        console.log(event.target.value);
+        const filterValue = event.target.value;
+
+        if (event.target.checked) {
+          filters.push(filterValue);
+        } else {
+          const index = filters.indexOf(filterValue);
+          if (index !== -1) {
+            filters.splice(index, 1);
+          }
+        }
+
+        console.log('Aktualne filtry:', filters);
         filterBooks();
       }
     });
@@ -69,22 +79,21 @@
   function filterBooks() {
     for (let book of dataSource.books) {
       let shouldBeHidden = false;
+
       for (let filter of filters) {
-        //jesli filtr powinien byc true a nie jest
         if (!book.details[filter]) {
           shouldBeHidden = true;
           break;
         }
+      }
 
-        //szukanie ksiazki po id
-        const bookElement = document.querySelector(`.book__image[data-id="${book.id}"]`);
+      const bookElement = document.querySelector(`.book__image[data-id="${book.id}"]`);
 
-        if (bookElement) {
-          if (shouldBeHidden) {
-            bookElement.classList.add('hidden');
-          } else {
-            bookElement.classList.remove('hidden');
-          }
+      if (bookElement) {
+        if (shouldBeHidden) {
+          bookElement.classList.add('hidden');
+        } else {
+          bookElement.classList.remove('hidden');
         }
       }
     }
