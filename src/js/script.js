@@ -4,6 +4,18 @@
   const favoriteBooks = [];
   const filters = [];
 
+  function determineRatingBgc(rating) {
+    if (rating < 6) {
+      return 'linear-gradient(to bottom, #fefcea 0%, #f1da36 100%)';
+    } else if (rating > 6 && rating <= 8) {
+      return 'linear-gradient(to bottom, #b4df5b 0%, #b4df5b 100%)';
+    } else if (rating > 8 && rating <= 9) {
+      return 'linear-gradient(to bottom, #299a0b 0%, #299a0b 100%)';
+    } else {
+      return 'linear-gradient(to bottom, #ff0084 0%, #ff0084 100%)';
+    }
+  }
+
   function render() {
     //pobieranie referencji do szablonu
     const templateBook = Handlebars.compile(
@@ -12,11 +24,25 @@
 
     //pobranie referencji do listy ksiazek
     const booksList = document.querySelector('.books-list');
+    booksList.innerHTML = '';
 
     //iteracja po kazdym elemencie z dataSource.books
     for (let book of dataSource.books) {
+
+      /*obliczenie ratingWidth i ratingBgc i
+      przeksztalcenie ratingu na sklae procentowa */
+      const ratingWidth = book.rating * 10;
+      const ratingBgc = determineRatingBgc(book.rating);
+
+      //dodanie nowych wlasciwosci do obiektu
+      const bookData = {
+        ...book,
+        ratingWidth,
+        ratingBgc,
+      };
+
       //wygenerwoanie kodu html na podstawie szablony idanych o konkretnej ksiazce
-      const generatedHTML = templateBook(book);
+      const generatedHTML = templateBook(bookData);
       //generowanie elemntu DOM na podstawie HTML
       const element = document.createElement('div');
       element.innerHTML = generatedHTML;
