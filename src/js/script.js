@@ -26,17 +26,28 @@
   }
 
   function initActions() {
-    const bookImage = document.querySelectorAll('.book-list .book__image');
+    const bookImages = document.querySelectorAll('.books-list .book__image');
     for (let bookImage of bookImages) {
       //nasluchiwacz
-      bookImage.addEventListener('click', function (event) {
+      bookImage.addEventListener('dblclick', function (event) {
         event.preventDefault();
 
         //add favorite class
         bookImage.classList.add('favorite');
         //pbiera identyfikator ksiazki z data-id
         const bookId = bookImage.getAttribute('data-id');
-        favoriteBooks.push(bookId);
+
+        if (favoriteBooks.includes(bookId)) {
+          //usuwa jesli jest w ulub
+          bookImage.classList.remove('favorite');
+          //znalezienie indexu
+          const index = favoriteBooks.indexOf(bookId);
+          favoriteBooks.splice(index, 1);
+        } else {
+          //dodanie klasy favorite
+          bookImage.classList.add('favorite');
+          favoriteBooks.push(bookId);
+        }
         console.log(favoriteBooks);
       });
     }
