@@ -26,32 +26,39 @@
   }
 
   function initActions() {
-    const bookImages = document.querySelectorAll('.books-list .book__image');
-    for (let bookImage of bookImages) {
-      //nasluchiwacz
-      bookImage.addEventListener('dblclick', function (event) {
-        event.preventDefault();
+    const booksList = document.querySelector('.books-list');
 
-        //add favorite class
-        bookImage.classList.add('favorite');
-        //pbiera identyfikator ksiazki z data-id
-        const bookId = bookImage.getAttribute('data-id');
+    if (!booksList) {
+      console.log("element .books-list nie istnieje");
+      return;
+    }
+
+    booksList.addEventListener('dblclick', function (event) {
+      //zatrzymanie dzialania
+      event.preventDefault();
+
+      //sprawdzanie klikniecia w okladke
+      const clickedElement = event.target.closest('.book__image');
+
+      if (clickedElement) {
+        //pobiera id ksiazki
+        const bookId = clickedElement.getAttribute('data-id');
 
         if (favoriteBooks.includes(bookId)) {
-          //usuwa jesli jest w ulub
-          bookImage.classList.remove('favorite');
-          //znalezienie indexu
+          //usuwanie z ulub
+          clickedElement.classList.remove('favorite');
           const index = favoriteBooks.indexOf(bookId);
           favoriteBooks.splice(index, 1);
         } else {
-          //dodanie klasy favorite
-          bookImage.classList.add('favorite');
+          //dodanie do ulub
+          clickedElement.classList.add('favorite');
           favoriteBooks.push(bookId);
         }
-        console.log(favoriteBooks);
-      });
-    }
+      }
+    });
   }
+
+
   //wywolanie
   render();
   initActions();
